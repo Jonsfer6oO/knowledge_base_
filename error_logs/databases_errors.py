@@ -30,7 +30,7 @@ class ErrorsBase(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     id_user: Mapped[int] = mapped_column(Integer(), ForeignKey("Users.id"))
     message: Mapped[str] = mapped_column(Text(1000), nullable=False)
-    event: Mapped[str] = mapped_column(String(100), nullable=False)
+    event: Mapped[str] = mapped_column(String(500), nullable=False)
     error_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
 
     user_errors: Mapped["Parent"] = relationship("UsersBase", back_populates="errors")  # type: ignore
