@@ -104,7 +104,7 @@ def add_article(obj: ArticlesBase) -> bool:
             session.commit()
             return True
 
-def get_article_by_id(id: int) -> List[ArticlesBase] | bool:
+def get_article_by_id(id: int) -> ArticlesBase | bool:
     with Session() as session:
         try:
             statement = select(ArticlesBase).where(ArticlesBase.id==int(id))
@@ -117,7 +117,7 @@ def get_article_by_id(id: int) -> List[ArticlesBase] | bool:
         except:
             return False
 
-def get_articles_by_user_id(user_id: int):
+def get_articles_by_user_id(user_id: int) -> List[ArticlesBase]:
     with Session() as session:
         try:
             statement = select(ArticlesBase).where(ArticlesBase.user_id==int(user_id))
