@@ -14,16 +14,17 @@ class UsersBase(Base):
     __tablename__ = "Users"
 
     def __init__(self, **kw):
-        """Creating a user object.
+        """
+            Creating a user object.
 
-        Parameters:
-            login (str): Unique username (3-30 characters).
-            email (str): Unique email address (max 50 characters).
-            phone (str): Unique phone number (integer value stored as string).
-            birthday (date): User's date of birth.
-            registration_date (datetime): Date and time of registration.
-            rating (float): User rating score.
-            id (Optional[int]): Auto-generated primary key if None. Defaults to None.
+            Parameters:
+                login (str): Unique username (3-30 characters).
+                email (str): Unique email address (max 50 characters).
+                phone (str): Unique phone number (integer value stored as string).
+                birthday (date): User's date of birth.
+                registration_date (datetime): Date and time of registration.
+                rating (float): User rating score.
+                id (Optional[int]): Auto-generated primary key if None. Defaults to None.
         """
 
         for key, value in kw.items():
@@ -37,6 +38,7 @@ class UsersBase(Base):
     birthday: Mapped[date] = mapped_column(Date(), nullable=False)
     registration_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     rating: Mapped[float] = mapped_column(Float(), nullable=False)
+
 
     # Устанавливает связь с атрибутами указанной таблицы на уровне python
     # back_populates - помогает при обновлении данных в одной из таблиц
@@ -58,17 +60,18 @@ class ArticlesBase(Base):
     __tablename__ = "Articles"
 
     def __init__(self, **kw):
-        """Creating a user articles.
+        """
+            Creating a user articles.
 
-        Parameters:
-            user_id (int): ID of the author (foreign key to Users table)
-            title (str): Article title (max 100 characters)
-            text (str): Article content (max 20,000 bytes as BLOB)
-            creation_date (datetime): Date and time when article was created
-            rating (float): Article rating score
-            co_author_login (Optional[str]): Login of co-author (max 30 chars). Defaults to None.
-            parent_id (Optional[int]): ID of parent article for replies/versions. Defaults to None.
-            id (Optional[int]): Auto-generated primary key if None. Defaults to None.
+            Parameters:
+                user_id (int): ID of the author (foreign key to Users table)
+                title (str): Article title (max 100 characters)
+                text (str): Article content (max 20,000 bytes as BLOB)
+                creation_date (datetime): Date and time when article was created
+                rating (float): Article rating score
+                co_author_login (Optional[str]): Login of co-author (max 30 chars). Defaults to None.
+                parent_id (Optional[int]): ID of parent article for replies/versions. Defaults to None.
+                id (Optional[int]): Auto-generated primary key if None. Defaults to None.
         """
 
         for key, value in kw.items():

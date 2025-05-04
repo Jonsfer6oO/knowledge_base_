@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from typing import List
 
 from users import UsersBase, ArticlesBase
 from configurations import Session
@@ -103,27 +104,29 @@ def add_article(obj: ArticlesBase) -> bool:
             session.commit()
             return True
 
-def get_article(value: int, attribute: str = "none", more: bool = False) -> ArticlesBase | bool:
-    """
-        Function to get user article(-s).
-
-        Parameters:
-            -  atribute - may be 'id' or 'user_id';
-            -  more - one(False) or all(True) object;
-            -  value - sqarch value.
-
-        Warning:
-            If **attribute** == 'none' or other, then search will be **attribute** == 'user_id'.
-    """
-
+def get_article_by_id(id: int) -> List[ArticlesBase] | bool:
     with Session() as session:
         try:
-            if attribute == "id":
-                statement = select(ArticlesBase).where(ArticlesBase.id==int(value))
-            else:
-                statement = select(ArticlesBase).where(ArticlesBase.user_id==int(value))
+            statement = select(ArticlesBase).where(ArticlesBase.id==int(id))
+            db_object = session.scalars(statement).first()
 
-            db_object = session.scalars(statement).all() if more else session.scalars(statement).one()
+            _ = db_object.user
+
+            return db_object
+
+        except:
+            return False
+
+def get_articles_by_user_id(user_id: int):
+    with Session() as session:
+        try:
+            statement = select(ArticlesBase).where(ArticlesBase.user_id==int(user_id))
+
+            db_object = session.scalars(statement).all()
+
+            elem: ArticlesBase
+            for elem in db_object:
+                _ = elem.user
 
             return db_object
 
@@ -143,7 +146,7 @@ def update_article(id: int, **new_values) -> bool:
     """
     with Session() as session:
         try:
-            article = get_article(id)
+            article = get_article_by_id(id)
             for key, value in new_values.items():
                 if hasattr(article, key):
                     setattr(article, key, value)
@@ -161,7 +164,7 @@ def update_article(id: int, **new_values) -> bool:
 def del_article(id: int) -> bool:
     with Session() as session:
         try:
-            article = get_article(id)
+            article = get_article_by_id(id)
             session.delete(article)
         except:
             session.rollback()
