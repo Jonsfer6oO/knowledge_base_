@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, String
+from sqlalchemy import Integer, String, LargeBinary
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, mapped_column
 from sqlalchemy.orm import Mapped
@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped
 from typing import List
 
 from configurations import Base
+from hash_functions import hashed_password
 
 
 class AdminsBase(Base):
@@ -27,10 +28,15 @@ class AdminsBase(Base):
             if hasattr(self, key):
                 setattr(self, key, value)
 
+            salt, hash_pass = hashed_password(kw["password"])
+            setattr(self, "salt", salt)
+            setattr(self, "password", hash_pass)
+
 
     id: Mapped[int] = mapped_column(primary_key=True)
     id_user: Mapped[int] = mapped_column(Integer(), ForeignKey("Users.id"))
     login: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(30), nullable=False)
+    salt: Mapped[bytes] = mapped_column(LargeBinary(16), nullable=False)
 
     user_admin: Mapped["Parent"] = relationship("UsersBase", back_populates="admin", uselist=False) # type: ignore

@@ -3,6 +3,7 @@ from typing import List
 
 from admins import AdminsBase
 from configurations import Session
+from hash_functions import hashed_password
 
 def add_admin(obj: AdminsBase) -> bool:
     with Session() as session:
@@ -44,7 +45,7 @@ def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | bool:
         except:
             return False
 
-def get_admin_by_id(int: id) -> AdminsBase | bool:
+def get_admin_by_id(id: int) -> AdminsBase | bool:
     with Session() as session:
         try:
             statement = select(AdminsBase).where(AdminsBase.id==int(id))
@@ -75,6 +76,12 @@ def update_admin(user_id: int, **new_values) -> bool:
             for key, value in new_values.items():
                 if hasattr(admin, key):
                     setattr(admin, key, value)
+
+                if new_values.get("password", 0) != 0:
+                    salt, hash_pass = hashed_password(new_values["password"])
+
+                    admin.salt = salt
+                    admin.password = hash_pass
 
             session.merge(admin)
 

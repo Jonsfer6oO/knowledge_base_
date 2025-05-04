@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, String
+from sqlalchemy import String, LargeBinary
 
 from configurations import Base
+from hash_functions import hashed_password
 
 
 class AccountsBase(Base):
@@ -22,6 +23,11 @@ class AccountsBase(Base):
             if hasattr(self, key):
                 setattr(self, key, value)
 
+            salt, hash_pass = hashed_password(self.password)
+            setattr(self, "salt", salt)
+            setattr(self, "password", hash_pass)
+
     id: Mapped[int] = mapped_column(primary_key=True)
     login: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(50), nullable=False)
+    salt: Mapped[bytes] = mapped_column(LargeBinary(16), nullable=False)
