@@ -13,6 +13,23 @@ class UsersBase(Base):
 
     __tablename__ = "Users"
 
+    def __init__(self, **kw):
+        """Creating a user object.
+
+        Parameters:
+            login (str): Unique username (3-30 characters).
+            email (str): Unique email address (max 50 characters).
+            phone (str): Unique phone number (integer value stored as string).
+            birthday (date): User's date of birth.
+            registration_date (datetime): Date and time of registration.
+            rating (float): User rating score.
+            id (Optional[int]): Auto-generated primary key if None. Defaults to None.
+        """
+
+        for key, value in kw.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
+
     id: Mapped[int] = mapped_column(primary_key=True)  # Mapped - транслирует тип данных python в SQL
     login: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
@@ -23,15 +40,34 @@ class UsersBase(Base):
 
     # Устанавливает связь с атрибутами указанной таблицы на уровне python
     # back_populates - помогает при обновлении данных в одной из таблиц
-    article: Mapped[List["Child"]] = relationship("Articles", back_populates="user")
-    admin: Mapped[List["Child"]] = relationship("Admins", back_populates="user_admin", uselist=False)
-    black_list: Mapped[List["Child"]] = relationship("BlackList", back_populates="user_black", uselist=False)
+    article: Mapped[List["Child"]] = relationship("Articles", back_populates="user") # type: ignore
+    admin: Mapped["Child"] = relationship("Admins", back_populates="user_admin", uselist=False) # type: ignore
+    black_list: Mapped["Child"] = relationship("BlackList", back_populates="user_black", uselist=False) # type: ignore
+    errors: Mapped[List["Child"]] = relationship("Errors", back_populates="user_errors") # type: ignore
 
 
 class ArticlesBase(Base):
     """Model describing the user articles."""
 
     __tablename__ = "Articles"
+
+    def __init__(self, **kw):
+        """Creating a user articles.
+
+        Parameters:
+            user_id (int): ID of the author (foreign key to Users table)
+            title (str): Article title (max 100 characters)
+            text (str): Article content (max 20,000 bytes as BLOB)
+            creation_date (datetime): Date and time when article was created
+            rating (float): Article rating score
+            co_author_login (Optional[str]): Login of co-author (max 30 chars). Defaults to None.
+            parent_id (Optional[int]): ID of parent article for replies/versions. Defaults to None.
+            id (Optional[int]): Auto-generated primary key if None. Defaults to None.
+        """
+
+        for key, value in kw.items():
+            if hasattr(self, key):
+                setattr(self, key, value)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer(), ForeignKey("Users.id"))
@@ -42,4 +78,4 @@ class ArticlesBase(Base):
     creation_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     rating: Mapped[float] = mapped_column(Float(), nullable=False)
 
-    user: Mapped[List["Child"]] = relationship("Users", back_populates="article")
+    user: Mapped["Parent"] = relationship("Users", back_populates="article") # type: ignore
