@@ -40,10 +40,16 @@ class UsersBase(Base):
 
     # Устанавливает связь с атрибутами указанной таблицы на уровне python
     # back_populates - помогает при обновлении данных в одной из таблиц
-    article: Mapped[List["Child"]] = relationship("Articles", back_populates="user") # type: ignore
-    admin: Mapped["Child"] = relationship("Admins", back_populates="user_admin", uselist=False) # type: ignore
-    black_list: Mapped["Child"] = relationship("BlackList", back_populates="user_black", uselist=False) # type: ignore
-    errors: Mapped[List["Child"]] = relationship("Errors", back_populates="user_errors") # type: ignore
+    article: Mapped[List["Child"]] = relationship("ArticlesBase",  # type: ignore
+                                                  back_populates="user")
+    admin: Mapped["Child"] = relationship("AdminsBase",  # type: ignore
+                                          back_populates="user_admin",
+                                          uselist=False)
+    black_list: Mapped["Child"] = relationship("BlackListBase",  # type: ignore
+                                               back_populates="user_black",
+                                               uselist=False)
+    errors: Mapped[List["Child"]] = relationship("ErrorsBase", # type: ignore
+                                                 back_populates="user_errors")
 
 
 class ArticlesBase(Base):
@@ -78,4 +84,4 @@ class ArticlesBase(Base):
     creation_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     rating: Mapped[float] = mapped_column(Float(), nullable=False)
 
-    user: Mapped["Parent"] = relationship("Users", back_populates="article") # type: ignore
+    user: Mapped["Parent"] = relationship("UsersBase", back_populates="article") # type: ignore

@@ -33,4 +33,4 @@ class ErrorsBase(Base):
     event: Mapped[str] = mapped_column(String(100), nullable=False)
     error_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
 
-    user_errors: Mapped["Parent"] = relationship("Users", back_populates="errors")  # type: ignore
+    user_errors: Mapped["Parent"] = relationship("UsersBase", back_populates="errors")  # type: ignore

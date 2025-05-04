@@ -32,4 +32,4 @@ class BlackListBase(Base):
     cause: Mapped[str] = mapped_column(String(200), nullable=False)
     date_add: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
 
-    user_black: Mapped["Parent"] = relationship("Users", back_populates="black_list",  uselist=False) # type: ignore
+    user_black: Mapped["Parent"] = relationship("UsersBase", back_populates="black_list",  uselist=False) # type: ignore

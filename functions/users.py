@@ -3,10 +3,10 @@ from sqlalchemy import select
 from users import UsersBase, ArticlesBase
 from configurations import Session
 
-def add_user(UsersBase: object) -> bool:
+def add_user(obj: UsersBase) -> bool:
     with Session() as session:
         try:
-            session.add(object)
+            session.add(obj)
         except:
             session.rollback()  # Отменяет все незафиксированные изменения.
             return False
@@ -36,7 +36,12 @@ def get_user(value: int | str, attribute: str = "none") -> UsersBase | None:
                 statement = select(UsersBase).where(UsersBase.id==int(value))
 
             # Вернуть первый объект с типом python. all - вернет все объекты.
-            db_object = session.scalar(statement).one()
+            db_object = session.scalars(statement).one()
+
+            _ = db_object.article
+            _ = db_object.admin
+            _ = db_object.black_list
+            _ = db_object.errors
 
             return db_object
 

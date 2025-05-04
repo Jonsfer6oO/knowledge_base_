@@ -33,4 +33,4 @@ class AdminsBase(Base):
     login: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(30), nullable=False)
 
-    user_admin: Mapped["Parent"] = relationship("Users", back_populates="admin", uselist=False) # type: ignore
+    user_admin: Mapped["Parent"] = relationship("UsersBase", back_populates="admin", uselist=False) # type: ignore
