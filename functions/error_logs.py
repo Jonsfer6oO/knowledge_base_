@@ -15,7 +15,7 @@ def add_errors(obj: ErrorsBase) -> bool:
             session.commit()
             return True
 
-def get_errors_by_id(id: int) -> ErrorsBase:
+def get_error_by_id(id: int) -> ErrorsBase:
     with Session() as session:
         try:
             statement = select(ErrorsBase).where(ErrorsBase.id==int(id))
@@ -31,7 +31,7 @@ def get_errors_by_id(id: int) -> ErrorsBase:
 def get_errors_by_user_id(user_id: int) -> List[ErrorsBase]:
     with Session() as session:
         try:
-            statement = select(ErrorsBase).where(ErrorsBase.user_id==int(user_id))
+            statement = select(ErrorsBase).where(ErrorsBase.id_user==int(user_id))
 
             db_object = session.scalars(statement).all()
 
