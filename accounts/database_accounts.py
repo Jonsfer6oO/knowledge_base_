@@ -23,7 +23,7 @@ class AccountsBase(Base):
             if hasattr(self, key):
                 setattr(self, key, value)
 
-            salt, hash_pass = hashed_password(self.password)
+            salt, hash_pass = hashed_password(kw["password"])
             setattr(self, "salt", salt)
             setattr(self, "password", hash_pass)
 

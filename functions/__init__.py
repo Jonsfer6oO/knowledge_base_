@@ -7,3 +7,5 @@ from .black_list import add_black_list, get_user_black_list_id, get_user_black_l
 from .black_list import update_user_black_list, del_user_black_list
 
 from .admins import add_admin, get_admin, get_admin_by_id, update_admin, del_admin
+
+from .accounts import add_account, get_account, update_account, del_account
