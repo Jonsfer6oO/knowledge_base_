@@ -1,16 +1,28 @@
 from sqlalchemy import select
 from typing import List
+from datetime import datetime
 
 from admins import AdminsBase
 from configurations import Session
 from hash_functions import hashed_password
+from .other import convert_dict_in_str
+from error_logs import ErrorsBase
+from .error_logs import add_errors
 
 def add_admin(obj: AdminsBase) -> bool:
     with Session() as session:
         try:
             session.add(obj)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/admins.py] - add_admin(obj = {obj})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()
@@ -42,7 +54,15 @@ def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | bool:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/admins.py] - get_admin(value = {value}, attribute = {attribute})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def get_admin_by_id(id: int) -> AdminsBase | bool:
@@ -55,7 +75,15 @@ def get_admin_by_id(id: int) -> AdminsBase | bool:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/admins.py] - get_admin_by_id(id = {id})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def update_admin(user_id: int, **new_values) -> bool:
@@ -85,8 +113,17 @@ def update_admin(user_id: int, **new_values) -> bool:
 
             session.merge(admin)
 
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/admins.py] - update_admin(user_id = {user_id}, " +
+                        f"**new_values = {convert_dict_in_str(new_values)})",
+                error_date = datetime.now()
+            ))
+
             return False
 
         else:
@@ -98,8 +135,16 @@ def del_admin(user_id: int):
         try:
             article = get_admin(user_id)
             session.delete(article)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/admins.py] - del_admin(user_id = {user_id})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()

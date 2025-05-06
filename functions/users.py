@@ -1,6 +1,10 @@
 from sqlalchemy import select
 from typing import List
+from datetime import datetime
 
+from .error_logs import add_errors
+from error_logs import ErrorsBase
+from .other import convert_dict_in_str
 from users import UsersBase, ArticlesBase
 from configurations import Session
 
@@ -8,8 +12,17 @@ def add_user(obj: UsersBase) -> bool:
     with Session() as session:
         try:
             session.add(obj)
-        except:
+
+        except Exception as ex:
             session.rollback()  # Отменяет все незафиксированные изменения.
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - add_user(obj = {obj})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()
@@ -46,7 +59,15 @@ def get_user(value: int | str, attribute: str = "none") -> UsersBase | bool:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - get_user(value = {value}, attribute = {attribute})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def update_user(id: int, **new_values) -> bool:
@@ -71,8 +92,17 @@ def update_user(id: int, **new_values) -> bool:
             # Проверяет есть ли в сессии объект с таким же ключем. В случае успеха обновляет его.
             session.merge(user)
 
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - update_user(id = {id}, " +
+                        f"**new_values = {convert_dict_in_str(new_values)})",
+                error_date = datetime.now()
+            ))
+
             return False
 
         else:
@@ -84,21 +114,37 @@ def del_user(id: int) -> bool:
         try:
             user = get_user(id)
             session.delete(user)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - del_user(id = {id})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()
             return True
 
-# ---------------------------------------------------- articels --------------------------------------------------
+# ---------------------------------------------------- articles --------------------------------------------------
 
 def add_article(obj: ArticlesBase) -> bool:
     with Session() as session:
         try:
             session.add(obj)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - add_article(obj = {obj})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()
@@ -114,7 +160,15 @@ def get_article_by_id(id: int) -> ArticlesBase | bool:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - get_article_by_id(id = {id})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def get_articles_by_user_id(user_id: int) -> List[ArticlesBase]:
@@ -130,7 +184,15 @@ def get_articles_by_user_id(user_id: int) -> List[ArticlesBase]:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - get_articles_by_user_id(user_id = {user_id})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def update_article(id: int, **new_values) -> bool:
@@ -153,8 +215,17 @@ def update_article(id: int, **new_values) -> bool:
 
             session.merge(article)
 
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - update_article(id = {id}, " +
+                        f"**new_values = {convert_dict_in_str(new_values)})",
+                error_date = datetime.now()
+            ))
+
             return False
 
         else:
@@ -166,8 +237,16 @@ def del_article(id: int) -> bool:
         try:
             article = get_article_by_id(id)
             session.delete(article)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/users.py] - del_article(id = {id})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()

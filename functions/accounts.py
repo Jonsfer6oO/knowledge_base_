@@ -1,16 +1,28 @@
 from sqlalchemy import select
 from typing import List
+from datetime import datetime
 
 from accounts import AccountsBase
 from configurations import Session
 from hash_functions import hashed_password
+from .other import convert_dict_in_str
+from error_logs import ErrorsBase
+from .error_logs import add_errors
 
 def add_account(obj: AccountsBase):
     with Session() as session:
         try:
             session.add(obj)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/accounts.py] - add_account(obj = {obj})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()
@@ -40,9 +52,16 @@ def get_account(value: int | str, attribute: str = "none") -> AccountsBase | boo
 
             return db_object
 
-        except:
-            return False
+        except Exception as ex:
 
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/accounts.py] - get_account(value = {value}, attribute = {attribute})",
+                error_date = datetime.now()
+            ))
+
+            return False
 
 def update_account(id: int, **new_values) -> bool:
     """
@@ -71,8 +90,17 @@ def update_account(id: int, **new_values) -> bool:
 
             session.merge(admin)
 
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/accounts.py] - update_account(id = {id}, " +
+                        f"**new_value = {convert_dict_in_str(new_values)})",
+                error_date = datetime.now()
+            ))
+
             return False
 
         else:
@@ -84,8 +112,16 @@ def del_account(id: int):
         try:
             account = get_account(id)
             session.delete(account)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/accounts.py] - del_account(id = {id})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()

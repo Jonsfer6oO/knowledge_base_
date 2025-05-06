@@ -1,14 +1,26 @@
 from sqlalchemy import select
+from datetime import datetime
 
 from black_list import BlackListBase
 from configurations import Session
+from .error_logs import add_errors
+from error_logs import ErrorsBase
+from .other import convert_dict_in_str
 
 def add_black_list(obj: BlackListBase) -> bool:
     with Session() as session:
         try:
             session.add(obj)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/black_list.py] - add_black_list(obj = {obj})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()
@@ -24,7 +36,15 @@ def get_user_black_list_id(id: int) -> BlackListBase | bool:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/black_list.py] - get_user_black_list_id(id = {id})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def get_user_black_list_user_id(user_id: int) -> BlackListBase | bool:
@@ -37,7 +57,15 @@ def get_user_black_list_user_id(user_id: int) -> BlackListBase | bool:
 
             return db_object
 
-        except:
+        except Exception as ex:
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/black_list.py] - get_user_black_list_user_id(user_id = {user_id})",
+                error_date = datetime.now()
+            ))
+
             return False
 
 def update_user_black_list(user_id: int, **new_values) -> bool:
@@ -60,8 +88,17 @@ def update_user_black_list(user_id: int, **new_values) -> bool:
 
             session.merge(user_black_list)
 
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/black_list.py] - update_user_black_list(user_id = {user_id}, " +
+                        f"**new_values = {convert_dict_in_str(new_values)})",
+                error_date = datetime.now()
+            ))
+
             return False
 
         else:
@@ -73,8 +110,16 @@ def del_user_black_list(user_id: int) -> bool:
         try:
             user_black_list = get_user_black_list_user_id(user_id)
             session.delete(user_black_list)
-        except:
+        except Exception as ex:
             session.rollback()
+
+            add_errors(ErrorsBase(
+                id_user = 0,
+                message = str(ex),
+                event = f"[functions/black_list.py] - del_user_black_list(user_id = {user_id})",
+                error_date = datetime.now()
+            ))
+
             return False
         else:
             session.commit()

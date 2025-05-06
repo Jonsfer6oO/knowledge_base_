@@ -18,9 +18,9 @@ class AdminsBase(Base):
         """Initialize a new admin instance.
 
         Parameters:
+            id_user (int): Reference to parent user if applicable.
             login (str): Unique username (3-30 characters)
             password (str): User password (will be hashed before storage)
-            id_user (Optional[int]): Reference to parent user if applicable. Defaults to None.
             id (Optional[int]): Auto-incremented primary key. Defaults to None.
         """
 
@@ -40,3 +40,7 @@ class AdminsBase(Base):
     salt: Mapped[bytes] = mapped_column(LargeBinary(16), nullable=False)
 
     user_admin: Mapped["Parent"] = relationship("UsersBase", back_populates="admin", uselist=False) # type: ignore
+
+    def __str__(self):
+        attrs = ', '.join(f"{k}={v}" for k, v in vars(self).items())
+        return f"{self.__class__.__name__}({attrs})"

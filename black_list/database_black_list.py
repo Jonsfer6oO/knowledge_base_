@@ -33,3 +33,7 @@ class BlackListBase(Base):
     date_add: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
 
     user_black: Mapped["Parent"] = relationship("UsersBase", back_populates="black_list",  uselist=False) # type: ignore
+
+    def __str__(self):
+        attrs = ', '.join(f"{k}={v}" for k, v in vars(self).items())
+        return f"{self.__class__.__name__}({attrs})"

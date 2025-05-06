@@ -31,3 +31,7 @@ class AccountsBase(Base):
     login: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(50), nullable=False)
     salt: Mapped[bytes] = mapped_column(LargeBinary(16), nullable=False)
+
+    def __str__(self):
+        attrs = ', '.join(f"{k}={v}" for k, v in vars(self).items())
+        return f"{self.__class__.__name__}({attrs})"

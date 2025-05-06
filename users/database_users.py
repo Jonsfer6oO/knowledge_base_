@@ -53,6 +53,10 @@ class UsersBase(Base):
     errors: Mapped[List["Child"]] = relationship("ErrorsBase", # type: ignore
                                                  back_populates="user_errors")
 
+    def __str__(self):
+        attrs = ', '.join(f"{k}={v}" for k, v in vars(self).items())
+        return f"{self.__class__.__name__}({attrs})"
+
 
 class ArticlesBase(Base):
     """Model describing the user articles."""
@@ -88,3 +92,7 @@ class ArticlesBase(Base):
     rating: Mapped[float] = mapped_column(Float(), nullable=False)
 
     user: Mapped["Parent"] = relationship("UsersBase", back_populates="article") # type: ignore
+
+    def __str__(self):
+        attrs = ', '.join(f"{k}={v}" for k, v in vars(self).items())
+        return f"{self.__class__.__name__}({attrs})"
