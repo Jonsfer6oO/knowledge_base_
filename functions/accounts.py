@@ -4,7 +4,7 @@ from datetime import datetime
 
 from accounts import AccountsBase
 from configurations import Session
-from hash_functions import hashed_password
+from crypto.hash_functions import hashed_password
 from .other import convert_dict_in_str
 from error_logs import ErrorsBase
 from .error_logs import add_errors
@@ -28,7 +28,7 @@ def add_account(obj: AccountsBase):
             session.commit()
             return True
 
-def get_account(value: int | str, attribute: str = "none") -> AccountsBase | bool:
+def get_account(value: int | str, attribute: str = "none") -> AccountsBase | None | bool:
     """
         Function to get account objects.
 
@@ -48,7 +48,7 @@ def get_account(value: int | str, attribute: str = "none") -> AccountsBase | boo
             else:
                 statement = select(AccountsBase).where(AccountsBase.id==int(value))
 
-            db_object = session.scalars(statement).first()
+            db_object = session.scalars(statement).one_or_none()
 
             return db_object
 
@@ -63,7 +63,7 @@ def get_account(value: int | str, attribute: str = "none") -> AccountsBase | boo
 
             return False
 
-def update_account(id: int, **new_values) -> bool:
+def update_account(id: int, **new_values) -> bool | None:
     """
         Function for updating admin.
 
@@ -77,18 +77,21 @@ def update_account(id: int, **new_values) -> bool:
 
     with Session() as session:
         try:
-            admin = get_account(id)
-            for key, value in new_values.items():
-                if hasattr(admin, key):
-                    setattr(admin, key, value)
+            account = get_account(id)
+            if account != None:
+                for key, value in new_values.items():
+                    if hasattr(account, key):
+                        setattr(account, key, value)
 
-                if new_values.get("password", 0) != 0:
-                    salt, hash_pass = hashed_password(new_values["password"])
+                    if new_values.get("password", 0) != 0:
+                        salt, hash_pass = hashed_password(new_values["password"])
 
-                    admin.salt = salt
-                    admin.password = hash_pass
+                        account.salt = salt
+                        account.password = hash_pass
+            else:
+                return None
 
-            session.merge(admin)
+            session.merge(account)
 
         except Exception as ex:
             session.rollback()
@@ -107,11 +110,15 @@ def update_account(id: int, **new_values) -> bool:
             session.commit()
             return True
 
-def del_account(id: int):
+def del_account(id: int) -> bool | None:
     with Session() as session:
         try:
             account = get_account(id)
-            session.delete(account)
+            if account != None:
+                session.delete(account)
+            else:
+                return None
+
         except Exception as ex:
             session.rollback()
 

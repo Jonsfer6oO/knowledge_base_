@@ -28,7 +28,7 @@ def add_user(obj: UsersBase) -> bool:
             session.commit()
             return True
 
-def get_user(value: int | str, attribute: str = "none") -> UsersBase | bool:
+def get_user(value: int | str, attribute: str = "none") -> UsersBase | None | bool:
     """
         Function to get user objects.
 
@@ -50,7 +50,7 @@ def get_user(value: int | str, attribute: str = "none") -> UsersBase | bool:
                 statement = select(UsersBase).where(UsersBase.id==int(value))
 
             # Вернуть первый объект с типом python. all - вернет все объекты.
-            db_object = session.scalars(statement).one()
+            db_object = session.scalars(statement).one_or_none()
 
             _ = db_object.article
             _ = db_object.admin
@@ -70,7 +70,7 @@ def get_user(value: int | str, attribute: str = "none") -> UsersBase | bool:
 
             return False
 
-def update_user(id: int, **new_values) -> bool:
+def update_user(id: int, **new_values) -> bool | None:
     """
         Function for updating user objects.
 
@@ -85,12 +85,15 @@ def update_user(id: int, **new_values) -> bool:
     with Session() as session:
         try:
             user = get_user(id)
-            for key, value in new_values.items():
-                if hasattr(user, key):  # Проверка на существование атрибута.
-                    setattr(user, key, value)  # Изменение значения атрибута.
+            if user != None:
+                for key, value in new_values.items():
+                    if hasattr(user, key):  # Проверка на существование атрибута.
+                        setattr(user, key, value)  # Изменение значения атрибута.
 
-            # Проверяет есть ли в сессии объект с таким же ключем. В случае успеха обновляет его.
-            session.merge(user)
+                # Проверяет есть ли в сессии объект с таким же ключем. В случае успеха обновляет его.
+                session.merge(user)
+            else:
+                return None
 
         except Exception as ex:
             session.rollback()
@@ -109,11 +112,15 @@ def update_user(id: int, **new_values) -> bool:
             session.commit()
             return True
 
-def del_user(id: int) -> bool:
+def del_user(id: int) -> bool | None:
     with Session() as session:
         try:
             user = get_user(id)
-            session.delete(user)
+            if user != None:
+                session.delete(user)
+            else:
+                return None
+
         except Exception as ex:
             session.rollback()
 
@@ -150,11 +157,11 @@ def add_article(obj: ArticlesBase) -> bool:
             session.commit()
             return True
 
-def get_article_by_id(id: int) -> ArticlesBase | bool:
+def get_article_by_id(id: int) -> ArticlesBase | None | bool:
     with Session() as session:
         try:
             statement = select(ArticlesBase).where(ArticlesBase.id==int(id))
-            db_object = session.scalars(statement).first()
+            db_object = session.scalars(statement).one_or_none()
 
             _ = db_object.user
 
@@ -171,7 +178,7 @@ def get_article_by_id(id: int) -> ArticlesBase | bool:
 
             return False
 
-def get_articles_by_user_id(user_id: int) -> List[ArticlesBase]:
+def get_articles_by_user_id(user_id: int) -> List[ArticlesBase] | List | bool:
     with Session() as session:
         try:
             statement = select(ArticlesBase).where(ArticlesBase.user_id==int(user_id))
@@ -195,7 +202,7 @@ def get_articles_by_user_id(user_id: int) -> List[ArticlesBase]:
 
             return False
 
-def update_article(id: int, **new_values) -> bool:
+def update_article(id: int, **new_values) -> bool | None:
     """
         Function for updating user articles.
 
@@ -209,9 +216,12 @@ def update_article(id: int, **new_values) -> bool:
     with Session() as session:
         try:
             article = get_article_by_id(id)
-            for key, value in new_values.items():
-                if hasattr(article, key):
-                    setattr(article, key, value)
+            if article != None:
+                for key, value in new_values.items():
+                    if hasattr(article, key):
+                        setattr(article, key, value)
+            else:
+                return None
 
             session.merge(article)
 
@@ -232,11 +242,15 @@ def update_article(id: int, **new_values) -> bool:
             session.commit()
             return True
 
-def del_article(id: int) -> bool:
+def del_article(id: int) -> bool | None:
     with Session() as session:
         try:
             article = get_article_by_id(id)
-            session.delete(article)
+            if article != None:
+                session.delete(article)
+            else:
+                return None
+
         except Exception as ex:
             session.rollback()
 

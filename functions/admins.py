@@ -4,7 +4,7 @@ from datetime import datetime
 
 from admins import AdminsBase
 from configurations import Session
-from hash_functions import hashed_password
+from crypto.hash_functions import hashed_password
 from .other import convert_dict_in_str
 from error_logs import ErrorsBase
 from .error_logs import add_errors
@@ -28,7 +28,7 @@ def add_admin(obj: AdminsBase) -> bool:
             session.commit()
             return True
 
-def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | bool:
+def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | None | bool:
     """
         Function to get admin objects.
 
@@ -48,7 +48,7 @@ def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | bool:
             else:
                 statement = select(AdminsBase).where(AdminsBase.id_user==int(value))
 
-            db_object = session.scalars(statement).first()
+            db_object = session.scalars(statement).one_or_none()
 
             _ = db_object.user_admin
 
@@ -65,11 +65,11 @@ def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | bool:
 
             return False
 
-def get_admin_by_id(id: int) -> AdminsBase | bool:
+def get_admin_by_id(id: int) -> AdminsBase | None | bool:
     with Session() as session:
         try:
             statement = select(AdminsBase).where(AdminsBase.id==int(id))
-            db_object = session.scalars(statement).one()
+            db_object = session.scalars(statement).one_or_none()
 
             _ = db_object.user_admin
 
@@ -86,7 +86,7 @@ def get_admin_by_id(id: int) -> AdminsBase | bool:
 
             return False
 
-def update_admin(user_id: int, **new_values) -> bool:
+def update_admin(user_id: int, **new_values) -> bool | None:
     """
         Function for updating admin.
 
@@ -101,15 +101,18 @@ def update_admin(user_id: int, **new_values) -> bool:
     with Session() as session:
         try:
             admin = get_admin(user_id)
-            for key, value in new_values.items():
-                if hasattr(admin, key):
-                    setattr(admin, key, value)
+            if admin != None:
+                for key, value in new_values.items():
+                    if hasattr(admin, key):
+                        setattr(admin, key, value)
 
-                if new_values.get("password", 0) != 0:
-                    salt, hash_pass = hashed_password(new_values["password"])
+                    if new_values.get("password", 0) != 0:
+                        salt, hash_pass = hashed_password(new_values["password"])
 
-                    admin.salt = salt
-                    admin.password = hash_pass
+                        admin.salt = salt
+                        admin.password = hash_pass
+            else:
+                return None
 
             session.merge(admin)
 
@@ -130,11 +133,15 @@ def update_admin(user_id: int, **new_values) -> bool:
             session.commit()
             return True
 
-def del_admin(user_id: int):
+def del_admin(user_id: int) -> bool | None:
     with Session() as session:
         try:
-            article = get_admin(user_id)
-            session.delete(article)
+            admin = get_admin(user_id)
+            if admin != None:
+                session.delete(admin)
+            else:
+                return None
+
         except Exception as ex:
             session.rollback()
 
