@@ -2,7 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, LargeBinary
 
 from configurations import Base
-from hash_functions import hashed_password
+from crypto import hashed_password
 
 
 class AccountsBase(Base):

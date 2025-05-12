@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped
 from typing import List
 
 from configurations import Base
-from hash_functions import hashed_password
+from crypto import hashed_password
 
 
 class AdminsBase(Base):

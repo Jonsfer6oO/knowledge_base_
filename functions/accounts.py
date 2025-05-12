@@ -4,7 +4,7 @@ from datetime import datetime
 
 from accounts import AccountsBase
 from configurations import Session
-from crypto.hash_functions import hashed_password
+from crypto import hashed_password
 from .other import convert_dict_in_str
 from error_logs import ErrorsBase
 from .error_logs import add_errors
