@@ -21,7 +21,8 @@ def add_user_api(user: table_models.User_for_input_api):
                 detail="User regestration failed"
             )
 
-        return table_models.Response_model(type="success", data=user.__dict__)
+        return table_models.Response_model(type="success",
+                                           data=table_models.User_api(**adding.__dict__).__dict__)
     except HTTPException:
         raise
     except Exception as ex:
