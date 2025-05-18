@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, Union
 
 
 from users import UsersBase, ArticlesBase
@@ -18,13 +18,13 @@ class Response_model(BaseModel):
 class User_api(BaseModel):
     """Model describing the user."""
 
-    id: int = 0
+    id: int
     login: str
     email: str
     phone: int
     birthday: date
     registration_date: datetime
-    rating: float = 0.0
+    rating: float
 
     # article: Optional["ArticlesBase"] = None
     # admin: Optional["AdminsBase"] = None
@@ -35,12 +35,12 @@ class User_api(BaseModel):
 class User_for_update_api(BaseModel):
     """Model describing the user for update."""
 
-    login: str = "none"
-    email: str = "none"
-    phone: int | str = "none"
-    birthday: date | str = "none"
-    registration_date: datetime | str = "none"
-    rating: float | str = "none"
+    login: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[int] = None
+    birthday: Optional[date] = None
+    registration_date: Optional[datetime] = None
+    rating: Optional[float] = None
 
 
 class User_for_input_api(BaseModel):
@@ -54,3 +54,41 @@ class User_for_input_api(BaseModel):
     rating: float = 0.0
 
 # ---------------------------------------------------- articles --------------------------------------------------
+
+class Article_api(BaseModel):
+    """Model describing the user article."""
+
+    id: int
+    user_id: int
+    title: str
+    text: str
+    creation_date: datetime
+    rating: float
+    co_author_login: Optional[str] = None
+    parent_id: Optional[str] = None
+
+    #user: Optional["UsersBase"] = None
+
+
+class Article_for_update_api(BaseModel):
+    """Model describing the user article for update."""
+
+    user_id: Optional[int] = None
+    title: Optional[str] = None
+    text: Optional[str] = None
+    creation_date: Optional[datetime] = None
+    rating: Optional[float] = None
+    co_author_login: Optional[str] = None
+    parent_id: Optional[str] = None
+
+
+class Article_for_input_api(BaseModel):
+    """Model describing the user for input."""
+
+    user_id: int
+    title: str
+    text: str
+    creation_date: datetime
+    rating: float
+    co_author_login: Optional[str] = None
+    parent_id: Optional[str] = None

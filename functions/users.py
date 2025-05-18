@@ -139,13 +139,15 @@ def del_user(id: int) -> bool | None:
 
 # ---------------------------------------------------- articles --------------------------------------------------
 
-def add_article(obj: ArticlesBase) -> bool:
+def add_article(obj: ArticlesBase) -> ArticlesBase | bool:
     with Session() as session:
         try:
             session.add(obj)
 
             session.commit()
-            return True
+            session.refresh(obj)
+
+            return obj
         except Exception as ex:
             session.rollback()
 
@@ -219,6 +221,8 @@ def update_article(id: int, **new_values) -> bool | None:
             article = get_article_by_id(id)
             if article != None:
                 for key, value in new_values.items():
+                    if key == "text":
+                        value = bytes(value, "utf-8")
                     if hasattr(article, key) and value != None:
                         setattr(article, key, value)
             else:
