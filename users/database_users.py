@@ -79,6 +79,8 @@ class ArticlesBase(Base):
         """
 
         for key, value in kw.items():
+            if key == "text":
+                value = bytes(value, "utf-8")
             if hasattr(self, key):
                 setattr(self, key, value)
 

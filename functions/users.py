@@ -8,13 +8,15 @@ from .other import convert_dict_in_str
 from users import UsersBase, ArticlesBase
 from configurations import Session
 
-def add_user(obj: UsersBase) -> bool:
+def add_user(obj: UsersBase) -> UsersBase | bool:
     with Session() as session:
         try:
             session.add(obj)
 
             session.commit()
-            return True
+            session.refresh(obj)
+
+            return obj
 
         except Exception as ex:
             session.rollback()  # Отменяет все незафиксированные изменения.
@@ -87,7 +89,7 @@ def update_user(id: int, **new_values) -> bool | None:
             user = get_user(id)
             if user != None:
                 for key, value in new_values.items():
-                    if hasattr(user, key) and value != "none":  # Проверка на существование атрибута.
+                    if hasattr(user, key) and value != None:  # Проверка на существование атрибута.
                         setattr(user, key, value)  # Изменение значения атрибута.
 
                 # Проверяет есть ли в сессии объект с таким же ключем. В случае успеха обновляет его.
@@ -217,7 +219,7 @@ def update_article(id: int, **new_values) -> bool | None:
             article = get_article_by_id(id)
             if article != None:
                 for key, value in new_values.items():
-                    if hasattr(article, key) and value != "none":
+                    if hasattr(article, key) and value != None:
                         setattr(article, key, value)
             else:
                 return None
