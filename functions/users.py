@@ -13,6 +13,9 @@ def add_user(obj: UsersBase) -> bool:
         try:
             session.add(obj)
 
+            session.commit()
+            return True
+
         except Exception as ex:
             session.rollback()  # Отменяет все незафиксированные изменения.
 
@@ -24,9 +27,6 @@ def add_user(obj: UsersBase) -> bool:
             ))
 
             return False
-        else:
-            session.commit()
-            return True
 
 def get_user(value: int | str, attribute: str = "none") -> UsersBase | None | bool:
     """
@@ -87,11 +87,14 @@ def update_user(id: int, **new_values) -> bool | None:
             user = get_user(id)
             if user != None:
                 for key, value in new_values.items():
-                    if hasattr(user, key):  # Проверка на существование атрибута.
+                    if hasattr(user, key) and value != "none":  # Проверка на существование атрибута.
                         setattr(user, key, value)  # Изменение значения атрибута.
 
                 # Проверяет есть ли в сессии объект с таким же ключем. В случае успеха обновляет его.
                 session.merge(user)
+
+                session.commit()
+                return True
             else:
                 return None
 
@@ -108,16 +111,15 @@ def update_user(id: int, **new_values) -> bool | None:
 
             return False
 
-        else:
-            session.commit()
-            return True
-
 def del_user(id: int) -> bool | None:
     with Session() as session:
         try:
             user = get_user(id)
             if user != None:
                 session.delete(user)
+
+                session.commit()
+                return True
             else:
                 return None
 
@@ -132,9 +134,6 @@ def del_user(id: int) -> bool | None:
             ))
 
             return False
-        else:
-            session.commit()
-            return True
 
 # ---------------------------------------------------- articles --------------------------------------------------
 
@@ -142,6 +141,9 @@ def add_article(obj: ArticlesBase) -> bool:
     with Session() as session:
         try:
             session.add(obj)
+
+            session.commit()
+            return True
         except Exception as ex:
             session.rollback()
 
@@ -153,9 +155,6 @@ def add_article(obj: ArticlesBase) -> bool:
             ))
 
             return False
-        else:
-            session.commit()
-            return True
 
 def get_article_by_id(id: int) -> ArticlesBase | None | bool:
     with Session() as session:
@@ -218,12 +217,15 @@ def update_article(id: int, **new_values) -> bool | None:
             article = get_article_by_id(id)
             if article != None:
                 for key, value in new_values.items():
-                    if hasattr(article, key):
+                    if hasattr(article, key) and value != "none":
                         setattr(article, key, value)
             else:
                 return None
 
             session.merge(article)
+
+            session.commit()
+            return True
 
         except Exception as ex:
             session.rollback()
@@ -238,16 +240,15 @@ def update_article(id: int, **new_values) -> bool | None:
 
             return False
 
-        else:
-            session.commit()
-            return True
-
 def del_article(id: int) -> bool | None:
     with Session() as session:
         try:
             article = get_article_by_id(id)
             if article != None:
                 session.delete(article)
+
+                session.commit()
+                return True
             else:
                 return None
 
@@ -262,6 +263,3 @@ def del_article(id: int) -> bool | None:
             ))
 
             return False
-        else:
-            session.commit()
-            return True
