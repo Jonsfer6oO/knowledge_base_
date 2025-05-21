@@ -4,16 +4,19 @@ from typing import List
 from error_logs import ErrorsBase
 from configurations import Session
 
-def add_errors(obj: ErrorsBase) -> bool:
+def add_errors(obj: ErrorsBase) -> ErrorsBase | bool:
     with Session() as session:
         try:
             session.add(obj)
+
+            session.commit()
+            session.refresh(obj)
+
+            return obj
+
         except:
             session.rollback()
             return False
-        else:
-            session.commit()
-            return True
 
 def get_error_by_id(id: int) -> ErrorsBase | None | bool:
     with Session() as session:

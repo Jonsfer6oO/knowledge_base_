@@ -92,3 +92,23 @@ class Article_for_input_api(BaseModel):
     rating: float
     co_author_login: Optional[str] = None
     parent_id: Optional[str] = None
+
+# ---------------------------------------------------- error logs --------------------------------------------------
+
+class Error_api(BaseModel):
+    """Model describing the error logs."""
+
+    id: int
+    id_user: int
+    message: str
+    event: str
+    error_date: datetime
+
+
+class Error_for_input_api(BaseModel):
+    """Model describing the error logs for update."""
+
+    id_user: int
+    message: str
+    event: str
+    error_date: datetime
