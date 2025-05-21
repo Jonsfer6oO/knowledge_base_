@@ -100,7 +100,7 @@ def update_article_api(id: int,
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Bad request"
             )
-        print(update)
+
         return {"type":"success", "status": f"{update}"}
 
     except HTTPException:
