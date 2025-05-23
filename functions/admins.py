@@ -9,10 +9,16 @@ from .other import convert_dict_in_str
 from error_logs import ErrorsBase
 from .error_logs import add_errors
 
-def add_admin(obj: AdminsBase) -> bool:
+def add_admin(obj: AdminsBase) -> AdminsBase | bool:
     with Session() as session:
         try:
             session.add(obj)
+
+            session.commit()
+            session.refresh(obj)
+
+            return obj
+
         except Exception as ex:
             session.rollback()
 
@@ -24,9 +30,6 @@ def add_admin(obj: AdminsBase) -> bool:
             ))
 
             return False
-        else:
-            session.commit()
-            return True
 
 def get_admin(value: int | str, attribute: str = "none") -> AdminsBase | None | bool:
     """
@@ -103,10 +106,10 @@ def update_admin(user_id: int, **new_values) -> bool | None:
             admin = get_admin(user_id)
             if admin != None:
                 for key, value in new_values.items():
-                    if hasattr(admin, key):
+                    if hasattr(admin, key) and value != None:
                         setattr(admin, key, value)
 
-                    if new_values.get("password", 0) != 0:
+                    if new_values.get("password") != None:
                         salt, hash_pass = hashed_password(new_values["password"])
 
                         admin.salt = salt
@@ -115,6 +118,9 @@ def update_admin(user_id: int, **new_values) -> bool | None:
                 return None
 
             session.merge(admin)
+
+            session.commit()
+            return True
 
         except Exception as ex:
             session.rollback()
@@ -128,10 +134,6 @@ def update_admin(user_id: int, **new_values) -> bool | None:
             ))
 
             return False
-
-        else:
-            session.commit()
-            return True
 
 def del_admin(user_id: int) -> bool | None:
     with Session() as session:

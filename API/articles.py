@@ -32,7 +32,7 @@ def add_article_api(article: table_models.Article_for_input_api):
             detail="Server error"
         )
 
-@article_router.get("get/{user_id}",
+@article_router.get("/get/user/{user_id}",
                     status_code=status.HTTP_200_OK,
                     summary="Getting article by user id",
                     responses={400: {"description": "Invalid input data"},

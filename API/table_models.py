@@ -112,3 +112,30 @@ class Error_for_input_api(BaseModel):
     message: str
     event: str
     error_date: datetime
+
+# ---------------------------------------------------- admins --------------------------------------------------
+
+class Admin_api(BaseModel):
+    """Model describing the admins."""
+
+    id: int
+    id_user: int
+    login: str
+    password: str
+    # salt: str
+
+
+class Admin_for_input_api(BaseModel):
+    """Model describing the admins for input."""
+
+    id_user: int
+    login: str
+    password: str
+
+
+class Admin_for_update_api(BaseModel):
+    """Model describing the admins for update."""
+
+    id_user: Optional[int] = None
+    login: Optional[str] = None
+    password: Optional[str] = None
