@@ -122,7 +122,7 @@ class Admin_api(BaseModel):
     id_user: int
     login: str
     password: str
-    # salt: str
+    salt: str
 
 
 class Admin_for_input_api(BaseModel):

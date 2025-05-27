@@ -37,7 +37,7 @@ class AdminsBase(Base):
     id_user: Mapped[int] = mapped_column(Integer(), ForeignKey("Users.id"))
     login: Mapped[str] = mapped_column(String(30), nullable=False, unique=True)
     password: Mapped[str] = mapped_column(String(30), nullable=False)
-    salt: Mapped[bytes] = mapped_column(LargeBinary(16), nullable=False)
+    salt: Mapped[str] = mapped_column(String(30), nullable=False)
 
     user_admin: Mapped["Parent"] = relationship("UsersBase", back_populates="admin", uselist=False) # type: ignore
 

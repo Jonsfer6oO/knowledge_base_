@@ -11,7 +11,7 @@ def hashed_password(password: str, salt: bytes = None) -> tuple:
                         salt=salt,
                         iterations=100000)
 
-    return salt, dk.hex()
+    return salt.hex(), dk.hex()
 
 def validate_password(secret: str, salt: bytes, password: str) -> bool:
     return secret == hashed_password(password, salt)[1]
