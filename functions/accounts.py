@@ -9,10 +9,16 @@ from .other import convert_dict_in_str
 from error_logs import ErrorsBase
 from .error_logs import add_errors
 
-def add_account(obj: AccountsBase):
+def add_account(obj: AccountsBase) -> AccountsBase | bool:
     with Session() as session:
         try:
             session.add(obj)
+
+            session.commit()
+            session.refresh(obj)
+
+            return obj
+
         except Exception as ex:
             session.rollback()
 
@@ -24,9 +30,6 @@ def add_account(obj: AccountsBase):
             ))
 
             return False
-        else:
-            session.commit()
-            return True
 
 def get_account(value: int | str, attribute: str = "none") -> AccountsBase | None | bool:
     """
@@ -80,7 +83,7 @@ def update_account(id: int, **new_values) -> bool | None:
             account = get_account(id)
             if account != None:
                 for key, value in new_values.items():
-                    if hasattr(account, key):
+                    if hasattr(account, key) and value != None:
                         setattr(account, key, value)
 
                     if new_values.get("password", 0) != 0:
@@ -92,6 +95,9 @@ def update_account(id: int, **new_values) -> bool | None:
                 return None
 
             session.merge(account)
+
+            session.commit()
+            return True
 
         except Exception as ex:
             session.rollback()
@@ -106,16 +112,15 @@ def update_account(id: int, **new_values) -> bool | None:
 
             return False
 
-        else:
-            session.commit()
-            return True
-
 def del_account(id: int) -> bool | None:
     with Session() as session:
         try:
             account = get_account(id)
             if account != None:
                 session.delete(account)
+
+                session.commit()
+                return True
             else:
                 return None
 
@@ -130,6 +135,3 @@ def del_account(id: int) -> bool | None:
             ))
 
             return False
-        else:
-            session.commit()
-            return True

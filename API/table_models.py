@@ -139,3 +139,53 @@ class Admin_for_update_api(BaseModel):
     id_user: Optional[int] = None
     login: Optional[str] = None
     password: Optional[str] = None
+
+# ---------------------------------------------------- accounts --------------------------------------------------
+
+class Account_api(BaseModel):
+    """Model describing the account."""
+
+    id: int
+    login: str
+    password: str
+    salt: str
+
+
+class Account_for_input_api(BaseModel):
+    """Model describing the account for input."""
+
+    login: str
+    password: str
+
+
+class Account_for_update_api(BaseModel):
+    """Model describing the account for update."""
+
+    login: Optional[str] = None
+    password: Optional[str] = None
+
+# ---------------------------------------------------- black_list --------------------------------------------------
+
+class Black_list_api(BaseModel):
+    """Model describing user in black list."""
+
+    id: int
+    id_user: int
+    cause: str
+    date_add: datetime
+
+
+class Black_list_for_input_api(BaseModel):
+    """Model describing user in black list for input."""
+
+    id_user: int
+    cause: str
+    date_add: datetime
+
+
+class Black_list_for_update_api(BaseModel):
+    """Model describing user in black list for update."""
+
+    id_user: Optional[int] = None
+    cause: Optional[str] = None
+    date_add: Optional[datetime] = None

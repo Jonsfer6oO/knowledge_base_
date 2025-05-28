@@ -7,10 +7,16 @@ from .error_logs import add_errors
 from error_logs import ErrorsBase
 from .other import convert_dict_in_str
 
-def add_black_list(obj: BlackListBase) -> bool:
+def add_black_list(obj: BlackListBase) -> BlackListBase | bool:
     with Session() as session:
         try:
             session.add(obj)
+
+            session.commit()
+            session.refresh(obj)
+
+            return obj
+
         except Exception as ex:
             session.rollback()
 
@@ -22,9 +28,6 @@ def add_black_list(obj: BlackListBase) -> bool:
             ))
 
             return False
-        else:
-            session.commit()
-            return True
 
 def get_user_black_list_id(id: int) -> BlackListBase | None | bool:
     with Session() as session:
@@ -84,12 +87,15 @@ def update_user_black_list(user_id: int, **new_values) -> bool | None:
             user_black_list = get_user_black_list_user_id(user_id)
             if user_black_list != None:
                 for key, value in new_values.items():
-                    if hasattr(user_black_list, key):
+                    if hasattr(user_black_list, key) and value != None:
                         setattr(user_black_list, key, value)
             else:
                 return None
 
             session.merge(user_black_list)
+
+            session.commit()
+            return True
 
         except Exception as ex:
             session.rollback()
@@ -104,16 +110,15 @@ def update_user_black_list(user_id: int, **new_values) -> bool | None:
 
             return False
 
-        else:
-            session.commit()
-            return True
-
 def del_user_black_list(user_id: int) -> bool | None:
     with Session() as session:
         try:
             user_black_list = get_user_black_list_user_id(user_id)
             if user_black_list != None:
                 session.delete(user_black_list)
+
+                session.commit()
+                return True
             else:
                 return None
         except Exception as ex:
@@ -127,6 +132,3 @@ def del_user_black_list(user_id: int) -> bool | None:
             ))
 
             return False
-        else:
-            session.commit()
-            return True

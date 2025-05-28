@@ -1,19 +1,18 @@
 from configurations import Session, config, create_db_and_tables, engine
 from functions import *
 
-from admins import AdminsBase
-from accounts import AccountsBase
-from black_list import BlackListBase
-from error_logs import ErrorsBase
-from users import UsersBase, ArticlesBase
-import rest_api
+import API
 
-from datetime import datetime, date
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 
 create_db_and_tables(engine)
 
 app = FastAPI()
 
 # Регистрация роутеров
-app.include_router(rest_api.router_users)
+app.include_router(API.user_router)
+app.include_router(API.article_router)
+app.include_router(API.error_router)
+app.include_router(API.admin_router)
+app.include_router(API.account_router)
+app.include_router(API.black_list_router)

@@ -58,7 +58,7 @@ def get_error_by_id_api(id: int):
             detail="Server error"
         )
 
-@error_router.get("/get/{user_id}",
+@error_router.get("/get/user/{user_id}",
                   status_code=status.HTTP_200_OK,
                   summary="Getting an error from the database by user id",
                   responses={400: {"description": "Invalid input data"},
