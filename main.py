@@ -11,7 +11,7 @@ main_logger = logging.getLogger(__name__)
 main_logger.setLevel(logging.INFO)
 
 # Хендлеры и форматеры
-main_file_handler = logging.FileHandler(filename=f"logs/{__name__}.log", mode="w", encoding="UTF-8")
+main_file_handler = logging.FileHandler(filename=f"logs/{__name__}.log", encoding="UTF-8")
 main_file_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 # Присоединение хендлеров и форматеров
