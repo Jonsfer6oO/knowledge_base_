@@ -65,7 +65,7 @@ class Article_api(BaseModel):
     creation_date: datetime
     rating: float
     co_author_login: Optional[str] = None
-    parent_id: Optional[str] = None
+    parent_id: Optional[int] = None
 
     #user: Optional["UsersBase"] = None
 
@@ -79,7 +79,7 @@ class Article_for_update_api(BaseModel):
     creation_date: Optional[datetime] = None
     rating: Optional[float] = None
     co_author_login: Optional[str] = None
-    parent_id: Optional[str] = None
+    parent_id: Optional[int] = None
 
 
 class Article_for_input_api(BaseModel):
@@ -91,7 +91,7 @@ class Article_for_input_api(BaseModel):
     creation_date: datetime
     rating: float
     co_author_login: Optional[str] = None
-    parent_id: Optional[str] = None
+    parent_id: Optional[int] = None
 
 # ---------------------------------------------------- error logs --------------------------------------------------
 
