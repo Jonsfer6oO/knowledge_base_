@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
+from handler_logging import LokiLogginHandler
 from accounts import AccountsBase
 from . import table_models
 import functions
@@ -11,6 +12,8 @@ accounts_api_logger.setLevel(logging.DEBUG)
 
 accounts_api_file_handler = logging.FileHandler(f"logs/API/{__name__}.log", encoding="UTF-8")
 accounts_api_file_handler_debug = logging.FileHandler(f"logs/API/{__name__}_debug.log", encoding="UTF-8")
+accounts_api_file_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+accounts_api_file_loki_handler.level = logging.DEBUG
 accounts_api_file_handler.level = logging.INFO
 accounts_api_file_handler_debug.level = logging.DEBUG
 accounts_api_formmater = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -18,8 +21,10 @@ accounts_api_formmater_debug = logging.Formatter("%(asctime)s - %(levelname)s - 
 
 accounts_api_file_handler.setFormatter(accounts_api_formmater)
 accounts_api_file_handler_debug.setFormatter(accounts_api_formmater_debug)
+accounts_api_file_loki_handler.setFormatter(accounts_api_formmater_debug)
 accounts_api_logger.addHandler(accounts_api_file_handler)
 accounts_api_logger.addHandler(accounts_api_file_handler_debug)
+accounts_api_logger.addHandler(accounts_api_file_loki_handler)
 
 account_router = APIRouter(prefix="/accounts", tags=["accounts"])
 

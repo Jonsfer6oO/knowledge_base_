@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
+from handler_logging import LokiLogginHandler
 from black_list import BlackListBase
 from . import table_models
 import functions
@@ -11,6 +12,8 @@ black_list_api_logger.level = logging.DEBUG
 
 black_list_api_file_handler = logging.FileHandler(f"logs/API/{__name__}.log", encoding="UTF-8")
 black_list_api_file_handler_debug = logging.FileHandler(f"logs/API/{__name__}_debug.log", encoding="UTF-8")
+black_list_api_file_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+black_list_api_file_loki_handler.level = logging.DEBUG
 black_list_api_file_handler.level = logging.INFO
 black_list_api_file_handler_debug.level = logging.DEBUG
 
@@ -19,8 +22,10 @@ black_list_api_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)s 
 
 black_list_api_file_handler.setFormatter(black_list_api_formatter)
 black_list_api_file_handler_debug.setFormatter(black_list_api_formatter_debug)
+black_list_api_file_loki_handler.setFormatter(black_list_api_formatter_debug)
 black_list_api_logger.addHandler(black_list_api_file_handler)
 black_list_api_logger.addHandler(black_list_api_file_handler_debug)
+black_list_api_logger.addHandler(black_list_api_file_loki_handler)
 
 black_list_router = APIRouter(prefix="/black_list", tags=["black_list"])
 

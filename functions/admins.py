@@ -2,6 +2,7 @@ from sqlalchemy import select
 from typing import List
 from datetime import datetime
 
+from handler_logging import LokiLogginHandler
 from admins import AdminsBase
 from configurations import Session
 from crypto import hashed_password
@@ -16,6 +17,8 @@ admins_functions_logger.setLevel(logging.DEBUG)
 
 admins_functions_handler = logging.FileHandler(f"logs/functions/{__name__}.log", encoding="UTF-8")
 admins_functions_handler_debug = logging.FileHandler(f"logs/functions/{__name__}_debug.log", encoding="UTF-8")
+admins_functions_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+admins_functions_loki_handler.level = logging.DEBUG
 admins_functions_handler.level = logging.INFO
 admins_functions_handler_debug.level = logging.DEBUG
 admins_functions_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -23,8 +26,10 @@ admins_functions_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)
 
 admins_functions_handler.setFormatter(admins_functions_formatter)
 admins_functions_handler_debug.setFormatter(admins_functions_formatter_debug)
+admins_functions_loki_handler.setFormatter(admins_functions_formatter_debug)
 admins_functions_logger.addHandler(admins_functions_handler)
 admins_functions_logger.addHandler(admins_functions_handler_debug)
+admins_functions_logger.addHandler(admins_functions_loki_handler)
 
 def add_admin(obj: AdminsBase) -> AdminsBase | bool:
     admins_functions_logger.info(f"Запрос на добавление в 'Admins': login={obj.login}")

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
+from handler_logging import LokiLogginHandler
 from users import ArticlesBase
 from . import table_models
 from . import other_functions
@@ -12,6 +13,8 @@ articles_api_logger.level = logging.DEBUG
 
 articles_api_file_handler = logging.FileHandler(f"logs/API/{__name__}.log", encoding="UTF-8")
 articles_api_file_handler_debug = logging.FileHandler(f"logs/API/{__name__}_debug.log", encoding="UTF-8")
+articles_api_file_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+articles_api_file_loki_handler.level = logging.DEBUG
 articles_api_file_handler.level = logging.INFO
 articles_api_file_handler_debug.level = logging.DEBUG
 
@@ -20,8 +23,10 @@ articles_api_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)s - 
 
 articles_api_file_handler.setFormatter(articles_api_formatter)
 articles_api_file_handler_debug.setFormatter(articles_api_formatter_debug)
+articles_api_file_loki_handler.setFormatter(articles_api_formatter_debug)
 articles_api_logger.addHandler(articles_api_file_handler)
 articles_api_logger.addHandler(articles_api_file_handler_debug)
+articles_api_logger.addHandler(articles_api_file_loki_handler)
 
 article_router = APIRouter(prefix="/articles", tags=["articles"])
 

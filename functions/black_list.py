@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from datetime import datetime
 
+from handler_logging import LokiLogginHandler
 from black_list import BlackListBase
 from configurations import Session
 from .error_logs import add_errors
@@ -14,6 +15,8 @@ black_list_functions_logger.setLevel(logging.DEBUG)
 
 black_list_functions_handler = logging.FileHandler(f"logs/functions/{__name__}.log", encoding="UTF-8")
 black_list_functions_handler_debug = logging.FileHandler(f"logs/functions/{__name__}_debug.log", encoding="UTF-8")
+black_list_functions_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+black_list_functions_loki_handler.level = logging.DEBUG
 black_list_functions_handler.level = logging.INFO
 black_list_functions_handler_debug.level = logging.DEBUG
 black_list_functions_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -21,8 +24,10 @@ black_list_functions_formatter_debug = logging.Formatter("%(asctime)s - %(leveln
 
 black_list_functions_handler.setFormatter(black_list_functions_formatter)
 black_list_functions_handler_debug.setFormatter(black_list_functions_formatter_debug)
+black_list_functions_loki_handler.setFormatter(black_list_functions_formatter_debug)
 black_list_functions_logger.addHandler(black_list_functions_handler)
 black_list_functions_logger.addHandler(black_list_functions_handler_debug)
+black_list_functions_logger.addHandler(black_list_functions_loki_handler)
 
 def add_black_list(obj: BlackListBase) -> BlackListBase | bool:
     black_list_functions_logger.info(f"Запрос на добавление в 'Black_list': user_id={obj.id_user}")

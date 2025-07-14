@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
+from handler_logging import LokiLogginHandler
 from users import UsersBase
 from . import table_models
 import functions
@@ -13,13 +14,17 @@ users_api_file_handler = logging.FileHandler(filename=f"logs/API/{__name__}.log"
 users_api_file_handler.level = logging.INFO
 users_api_file_handler_debug = logging.FileHandler(filename=f"logs/API/{__name__}_debug.log", encoding="UTF-8")
 users_api_file_handler_debug.level = logging.DEBUG
+user_api_file_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+user_api_file_loki_handler.level = logging.DEBUG
 users_api_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 users_api_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)s - %(name)s:%(lineno)d - %(message)s")
 
 users_api_file_handler.setFormatter(users_api_formatter)
 users_api_file_handler_debug.setFormatter(users_api_formatter_debug)
+user_api_file_loki_handler.setFormatter(users_api_formatter_debug)
 users_api_logger.addHandler(users_api_file_handler)
 users_api_logger.addHandler(users_api_file_handler_debug)
+users_api_logger.addHandler(user_api_file_loki_handler)
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 

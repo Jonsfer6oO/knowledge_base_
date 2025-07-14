@@ -2,6 +2,7 @@ from sqlalchemy import select
 from typing import List
 from datetime import datetime
 
+from handler_logging import LokiLogginHandler
 from .error_logs import add_errors
 from error_logs import ErrorsBase
 from .other import convert_dict_in_str
@@ -15,6 +16,8 @@ users_functions_logger.setLevel(logging.DEBUG)
 
 users_functions_handler = logging.FileHandler(f"logs/functions/{__name__}.log", encoding="UTF-8")
 users_functions_handler_debug = logging.FileHandler(f"logs/functions/{__name__}_debug.log", encoding="UTF-8")
+users_functions_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+users_functions_loki_handler.level = logging.DEBUG
 users_functions_handler.level = logging.INFO
 users_functions_handler_debug.level = logging.DEBUG
 users_functions_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -22,14 +25,18 @@ users_functions_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)s
 
 users_functions_handler.setFormatter(users_functions_formatter)
 users_functions_handler_debug.setFormatter(users_functions_formatter_debug)
+users_functions_loki_handler.setFormatter(users_functions_formatter_debug)
 users_functions_logger.addHandler(users_functions_handler)
 users_functions_logger.addHandler(users_functions_handler_debug)
+users_functions_logger.addHandler(users_functions_loki_handler)
 
 articles_functions_logger = logging.getLogger(f"{__name__}_artciles")
 articles_functions_logger.setLevel(logging.DEBUG)
 
 articles_functions_handler = logging.FileHandler(f"logs/functions/{__name__}_articles.log", encoding="UTF-8")
 articles_functions_handler_debug = logging.FileHandler(f"logs/functions/{__name__}_articles_debug.log", encoding="UTF-8")
+articles_functions_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+articles_functions_loki_handler.level = logging.DEBUG
 articles_functions_handler.level = logging.INFO
 articles_functions_handler_debug.level = logging.DEBUG
 articles_functions_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -37,8 +44,10 @@ articles_functions_formatter_debug = logging.Formatter("%(asctime)s - %(levelnam
 
 articles_functions_handler.setFormatter(articles_functions_formatter)
 articles_functions_handler_debug.setFormatter(articles_functions_formatter_debug)
+articles_functions_loki_handler.setFormatter(articles_functions_formatter_debug)
 articles_functions_logger.addHandler(articles_functions_handler)
 articles_functions_logger.addHandler(articles_functions_handler_debug)
+articles_functions_logger.addHandler(articles_functions_loki_handler)
 
 def add_user(obj: UsersBase) -> UsersBase | bool:
     users_functions_logger.info(f"Запрос на добавление в 'Users': login={obj.login}")

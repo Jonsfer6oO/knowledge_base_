@@ -3,6 +3,7 @@ from sqlalchemy import select
 from typing import List
 from datetime import datetime
 
+from handler_logging import LokiLogginHandler
 from accounts import AccountsBase
 from configurations import Session
 from crypto import hashed_password
@@ -17,6 +18,8 @@ accounts_functions_logger.setLevel(logging.DEBUG)
 
 accounts_functions_handler = logging.FileHandler(f"logs/functions/{__name__}.log", encoding="UTF-8")
 accounts_functions_handler_debug = logging.FileHandler(f"logs/functions/{__name__}_debug.log", encoding="UTF-8")
+accounts_functions_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+accounts_functions_loki_handler.level = logging.DEBUG
 accounts_functions_handler.level = logging.INFO
 accounts_functions_handler_debug.level = logging.DEBUG
 accounts_functions_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -24,8 +27,10 @@ accounts_functions_formatter_debug = logging.Formatter("%(asctime)s - %(levelnam
 
 accounts_functions_handler.setFormatter(accounts_functions_formatter)
 accounts_functions_handler_debug.setFormatter(accounts_functions_formatter_debug)
+accounts_functions_loki_handler.setFormatter(accounts_functions_formatter_debug)
 accounts_functions_logger.addHandler(accounts_functions_handler)
 accounts_functions_logger.addHandler(accounts_functions_handler_debug)
+accounts_functions_logger.addHandler(accounts_functions_loki_handler)
 
 def add_account(obj: AccountsBase) -> AccountsBase | bool:
     accounts_functions_logger.info(f"Запрос на добавление в 'Accounts': login={obj.login}")

@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from typing import List
 
+from handler_logging import LokiLogginHandler
 from error_logs import ErrorsBase
 from configurations import Session
 
@@ -11,6 +12,8 @@ errors_functions_logger.setLevel(logging.DEBUG)
 
 errors_functions_handler = logging.FileHandler(f"logs/functions/{__name__}.log", encoding="UTF-8")
 errors_functions_handler_debug = logging.FileHandler(f"logs/functions/{__name__}_debug.log", encoding="UTF-8")
+errors_functions_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+errors_functions_loki_handler.level = logging.DEBUG
 errors_functions_handler.level = logging.INFO
 errors_functions_handler_debug.level = logging.DEBUG
 errors_functions_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -18,8 +21,10 @@ errors_functions_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)
 
 errors_functions_handler.setFormatter(errors_functions_formatter)
 errors_functions_handler_debug.setFormatter(errors_functions_formatter_debug)
+errors_functions_loki_handler.setFormatter(errors_functions_formatter_debug)
 errors_functions_logger.addHandler(errors_functions_handler)
 errors_functions_logger.addHandler(errors_functions_handler_debug)
+errors_functions_logger.addHandler(errors_functions_loki_handler)
 
 def add_errors(obj: ErrorsBase) -> ErrorsBase | bool:
     errors_functions_logger.info(f"Запрос на добавление в 'Errors': user_id={obj.id_user}")

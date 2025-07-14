@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException
 
+from handler_logging import LokiLogginHandler
 from error_logs import ErrorsBase
 from . import table_models
 import functions
@@ -12,6 +13,8 @@ error_api_logger.level = logging.DEBUG
 
 error_api_file_handler = logging.FileHandler(f"logs/API/{__name__}.log", encoding="UTF-8")
 error_api_file_handler_debug = logging.FileHandler(f"logs/API/{__name__}_debug.log", encoding="UTF-8")
+error_api_file_loki_handler = LokiLogginHandler(url="http://localhost:3100/loki/api/v1/push")
+error_api_file_loki_handler.level = logging.DEBUG
 error_api_file_handler.level = logging.INFO
 error_api_file_handler_debug.level = logging.DEBUG
 
@@ -20,8 +23,10 @@ error_api_formatter_debug = logging.Formatter("%(asctime)s - %(levelname)s - %(n
 
 error_api_file_handler.setFormatter(error_api_formatter)
 error_api_file_handler_debug.setFormatter(error_api_formatter_debug)
+error_api_file_loki_handler.setFormatter(error_api_formatter_debug)
 error_api_logger.addHandler(error_api_file_handler)
 error_api_logger.addHandler(error_api_file_handler_debug)
+error_api_logger.addHandler(error_api_file_loki_handler)
 
 error_router = APIRouter(prefix="/error_logs", tags=["error_logs"])
 
